@@ -1,5 +1,23 @@
+
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            cloud 'minikube'
+            yaml '''
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+    - name: python
+      image: python:3.11-slim
+      command:
+        - sleep
+      args:
+        - 99d
+'''
+            defaultContainer 'python'
+        }
+    }
 
     stages {
         stage('Check files') {
@@ -12,9 +30,8 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                    python3 -m venv .venv
-                    .venv/bin/python -m pip install -r requirements.txt pytest
-                    .venv/bin/python -m pytest -v
+                    python -m pip install -r requirements.txt pytest
+                    python -m pytest -v
                 '''
             }
         }
