@@ -23,9 +23,12 @@ spec:
       tty: true
 
     - name: kubectl
-      image: registry.k8s.io/kubectl:v1.34.1
+      image: alpine/k8s:1.34.1
       command:
-        - kubectl
+        - /bin/sh
+      args:
+        - -c
+        - sleep 99d
       args:
         - proxy
         - --address=127.0.0.1
