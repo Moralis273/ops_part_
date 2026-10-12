@@ -45,15 +45,28 @@ spec:
         stage('Build image') {
             steps {
                 container('kaniko') {
-                    sh '''
-                        /kaniko/executor \
-                        --context "$WORKSPACE" \
-                        --dockerfile "$WORKSPACE/Dockerfile" \
-                        --destination ml-service:test \
-                        --no-push
-                    '''
-                }
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'dockerhub-credentials',
+                            usernameVariable: 'DOCKER_USER',
+                            passwordVariable: 'DOCKER_TOKEN'
+                        )
+                    ]) {
+                        sh '''
+                            mkdir -p /kaniko/.docker
+
+                            AUTH=$(printf '%s:%s' "$DOCKER_USER" "$DOCKER_TOKEN" | base64 | tr -d '\\n')
+
+                            printf '{"auths":{"https://index.docker.io/v1/":{"auth":"%s"}}}' "$AUTH" > /kaniko/.docker/config.json
+
+                            /kaniko/executor \
+                            --context "$WORKSPACE" \
+                            --dockerfile "$WORKSPACE/Dockerfile" \
+                            --destination "moralis1995/ml-service:v1"
+                        '''
+                    }
             }
         }
+    }
     }
 }
