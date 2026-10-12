@@ -4,32 +4,34 @@ pipeline {
         kubernetes {
             cloud 'minikube'
             yaml '''
-apiVersion: v1
-kind: Pod
-spec:
-  serviceAccountName: jenkins-agent
-  containers:
-    - name: python
-      image: python:3.11-slim
-      command:
-        - sleep
-      args:
-        - 99d
+            apiVersion: v1
+            kind: Pod
+            spec:
+            serviceAccountName: jenkins-agent
 
-    - name: kaniko
-      image: gcr.io/kaniko-project/executor:v1.23.2-debug
-      command:
-        - /busybox/cat
-      tty: true
-    - name: kubectl
-    image: registry.k8s.io/kubectl:v1.34.1
-    command:
-        - kubectl
-    args:
-        - proxy
-        - --address=127.0.0.1
-        - --port=8001
-'''
+            containers:
+                - name: python
+                image: python:3.11-slim
+                command:
+                    - sleep
+                args:
+                    - 99d
+
+                - name: kaniko
+                image: gcr.io/kaniko-project/executor:v1.23.2-debug
+                command:
+                    - /busybox/cat
+                tty: true
+
+                - name: kubectl
+                image: registry.k8s.io/kubectl:v1.34.1
+                command:
+                    - kubectl
+                args:
+                    - proxy
+                    - --address=127.0.0.1
+                    - --port=8001
+            '''
 
             defaultContainer 'python'
         }
