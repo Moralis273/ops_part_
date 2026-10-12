@@ -7,6 +7,7 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
+  serviceAccountName: jenkins-agent
   containers:
     - name: python
       image: python:3.11-slim
@@ -20,6 +21,12 @@ spec:
       command:
         - /busybox/cat
       tty: true
+    - name: kubectl
+      image: registry.k8s.io/kubectl:v1.34.1
+      command:
+        - sleep
+      args:
+        - 99d
 '''
 
             defaultContainer 'python'
@@ -62,11 +69,33 @@ spec:
                             /kaniko/executor \
                             --context "$WORKSPACE" \
                             --dockerfile "$WORKSPACE/Dockerfile" \
-                            --destination "moralis1995/ml-service:v1"
+                            --destination "moralis1995/ml-service:${BUILD_NUMBER}"
                         '''
                     }
             }
         }
     }
+        stage('Check Kubernetes access') {
+            steps {
+                container('kubectl') {
+                    sh '''
+                        kubectl auth can-i patch deployments/ml-service
+                        kubectl get deployment ml-service
+                    '''
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                container('kubectl') {
+                    sh '''
+                        kubectl set image deployment/ml-service \
+                        ml-service=moralis1995/ml-service:${BUILD_NUMBER}
+
+                        kubectl rollout status deployment/ml-service --timeout=180s
+                    '''
+                }
+            }
+        }
     }
 }

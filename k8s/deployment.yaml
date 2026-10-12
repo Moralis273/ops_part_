@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ml-service
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ml-service
+
+  template:
+    metadata:
+      labels:
+        app: ml-service
+
+    spec:
+      containers:
+        - name: ml-service
+          image: moralis1995/ml-service:v1
+
+          ports:
+            - containerPort: 5000
