@@ -22,11 +22,13 @@ spec:
         - /busybox/cat
       tty: true
     - name: kubectl
-      image: registry.k8s.io/kubectl:v1.34.1
-      command:
-        - sleep
-      args:
-        - 99d
+    image: registry.k8s.io/kubectl:v1.34.1
+    command:
+        - kubectl
+    args:
+        - proxy
+        - --address=127.0.0.1
+        - --port=8001
 '''
 
             defaultContainer 'python'
