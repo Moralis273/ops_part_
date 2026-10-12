@@ -14,7 +14,14 @@ spec:
         - sleep
       args:
         - 99d
+
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:v1.23.2-debug
+      command:
+        - /busybox/cat
+      tty: true
 '''
+
             defaultContainer 'python'
         }
     }
