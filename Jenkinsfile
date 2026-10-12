@@ -29,10 +29,6 @@ spec:
       args:
         - -c
         - sleep 99d
-      args:
-        - proxy
-        - --address=127.0.0.1
-        - --port=8001
 '''
             defaultContainer 'python'
         }
