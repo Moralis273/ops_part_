@@ -42,5 +42,18 @@ spec:
                 '''
             }
         }
+        stage('Build image') {
+            steps {
+                container('kaniko') {
+                    sh '''
+                        /kaniko/executor \
+                        --context "$WORKSPACE" \
+                        --dockerfile "$WORKSPACE/Dockerfile" \
+                        --destination ml-service:test \
+                        --no-push
+                    '''
+                }
+            }
+        }
     }
 }
