@@ -101,5 +101,42 @@ spec:
                 }
             }
         }
+
+        stage('Smoke Test') {
+            steps {
+                container('python') {
+                    sh '''
+python - <<'PY'
+import json
+import urllib.request
+
+url = "http://ml-service:5000/predict"
+
+data = json.dumps({
+    "age": 40,
+    "purchase_amount": 300
+}).encode()
+
+request = urllib.request.Request(
+    url,
+    data=data,
+    headers={"Content-Type": "application/json"},
+    method="POST"
+)
+
+with urllib.request.urlopen(request, timeout=10) as response:
+    assert response.status == 200
+    result = json.load(response)
+
+assert "probability" in result
+assert isinstance(result["probability"], (int, float))
+assert 0 <= result["probability"] <= 1
+
+print("Smoke test PASSED:", result)
+PY
+'''
+                }
+            }
+        }
     }
 }
