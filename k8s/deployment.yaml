@@ -19,7 +19,22 @@ spec:
     spec:
       containers:
         - name: ml-service
-          image: moralis1995/ml-service:v1
-
+          image: moralis1995/ml-service:17
           ports:
             - containerPort: 5000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
